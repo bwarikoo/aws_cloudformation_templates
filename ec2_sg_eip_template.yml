@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Template for EC2 instance creation with SG and EIP
+Resources:
+  # Define EC2 instance 
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-053b0d53c279acc90
+      InstanceType: t2.micro
+      KeyName: jenkins_keypair
+      SecurityGroups:
+        - !Ref MySG
+      Tags:
+        - Key: Name
+          Value: myinstance
+  # Define Security Group
+  MySG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: SecurityGroup_1
+      GroupDescription: Allow SSH and HTTP traffic
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+  # Define Elastic IP
+  MyEIP:
+    Type: AWS::EC2::EIP
+  # Associate Elastic IP with the EC2 instance
+  MyEIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      InstanceId: !Ref MyEC2Instance
+      EIP: !Ref MyEIP
